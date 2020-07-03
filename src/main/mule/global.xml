@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd">
+	<configuration-properties doc:name="Configuration properties" doc:id="dfb344a8-ceed-4c7e-baa1-8ab178a3ebfc" file="configuration.yaml" />
+	<wsc:config name="Web_Service_Consumer_Config" doc:name="Web Service Consumer Config" doc:id="8a6b3505-2b17-44dd-b90e-da13c753ac7e" >
+		<wsc:connection wsdlLocation="http://ilt.learn.mulesoft.com/essentials/delta?wsdl" service="TicketServiceService" port="TicketServicePort" address="http://training.cloudhub.io/essentials/delta" />
+	</wsc:config>
+	<http:request-config name="United_REST_Req_configuration" doc:name="HTTP Request configuration" doc:id="023637ea-d5ce-44ed-bd79-c9da2c3d5548" >
+	<http:request-connection host="${united.host}" port="80" />
+	</http:request-config>
+	
+	<wsc:config name="Trans_Web_Service_Consumer" doc:name="Web Service Consumer Config" doc:id="fcae09e4-3638-4d28-9519-b9bd0b4c0e57" >
+		<wsc:connection wsdlLocation="${webservice.wsdl}" service="${webservice.service}" port="${webservice.port}" address="${webservice.address}" />
+	</wsc:config>
+	<http:request-config name="Accounts_HTTP_Request_Configuration" doc:name="HTTP Request configuration" doc:id="ed116f81-d0fd-4023-a56e-894ffa6a742a" basePath="${accounts.basePath}">
+		<http:request-connection host="${accounts.host}" port="${accounts.port}" />
+	</http:request-config>
+	<configuration doc:name="Configuration" doc:id="5b749244-1059-4300-8db9-2bc7ceaee68f" defaultErrorHandler-ref="globalError_Handler" />
+	<error-handler name="globalError_Handler" doc:id="efecd485-c795-4f7e-afc9-1b6add84d305">
+		<on-error-continue enableNotifications="true" logException="true" doc:name="Validate error - Continue" doc:id="a6a978a7-b559-465d-a40c-bdaf82158008" type="VALIDATION:INVALID_BOOLEAN">
+			<set-payload value="#['NO FLIGHTS to ' ++ vars.code ++  '\n' ++  'Error Type: ' ++ error.errorType.namespace ++ ':' ++ error.errorType.identifier 
+   ++ '\n' ++ error.description]" doc:name="Set Payload" doc:id="fd9c616e-c8ab-4ef1-ac42-4bce5976bc57" />
+			<set-variable value="500" doc:name="Set HTTP status" doc:id="0c250976-0fcb-45d1-9585-b3385fc45e2d" variableName="httpStatus"/>
+		</on-error-continue>
+		<on-error-continue enableNotifications="true" logException="true" doc:name="Data unavailable - all other errors - Continue" doc:id="2f82e883-f01a-4ccb-80e6-fb735a3c0cc5" type="ANY">
+			<set-payload value="#['DATA UNAVAILABLE. TRY LATER\n' ++  'Error Type: ' ++ error.errorType.namespace ++ ':' ++ error.errorType.identifier
+++ '\n' ++ error.description]" doc:name="Set Payload" doc:id="02823c5d-695d-44c1-9b75-3dcea8005181" />
+			<set-variable value="400" doc:name="Set HTTP status" doc:id="ad7810e6-c45f-4eb1-8785-ef0e9f56ddab" variableName="httpStatus"/>
+		</on-error-continue>
+	</error-handler>
+	<flow name="filterArraysFlow" doc:id="6be24350-6f75-4b84-89a4-6496be4f3cf2" >
+		<choice doc:name="Choice" doc:id="94afeec0-45be-4413-af25-636b02098132" >
+			<when expression="#[payload.^class contains 'Array']" >
+				<set-payload value="#[payload]" doc:name="Set Payload" doc:id="9fa1f6c4-2b04-4a96-9221-dc82a7475b12" />
+			</when>
+			<otherwise >
+				<set-payload value="#[[]]" doc:name="Set Payload" doc:id="5689e190-10e9-43b8-af70-a379b8c895ad" />
+			</otherwise>
+		</choice>
+	</flow>
+</mule>

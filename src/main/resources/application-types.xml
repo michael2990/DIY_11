@@ -1,0 +1,93 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="united_flights_json" format="json">
+      <types:shape format="json-schema" location="schemas/united-flights-schema.json"/>
+    </types:type>
+    <types:type name="flights_json" format="json">
+      <types:example format="json" location="examples/flights-example.json"/>
+    </types:type>
+    <types:type name="american_flights_json" format="json">
+      <types:shape format="json-schema" location="schemas/american-flights-schema.json"/>
+    </types:type>
+    <types:type name="Flight_pojo" format="java">
+      <types:shape format="java" element="com.mulesoft.training.Flight"/>
+    </types:type>
+    <types:type name="flight_json" format="json">
+      <types:example format="json" location="examples/flight-example.json"/>
+    </types:type>
+    <types:type name="flights_xml" format="xml">
+      <types:example format="xml" element="{http://soap.training.mulesoft.com/}listAllFlightsResponse" location="examples/flights-example.xml"/>
+    </types:type>
+    <types:type name="flight_ID" format="json">
+      <types:shape format="weave" example="flightID.json"><![CDATA[%dw 2.0
+
+type flight_ID = {| flightIDs: Array<String> |} {"example": "{\\\"flightIDs\\\":[\\\"UNITEDER38SD2015-03-20\\\",\\\"UNITEDER39RK2015-09-11\\\",\\\"UNITEDER39RJ2015-02-12\\\",\\\"AMERICANRREE10932016-02-11\\\",\\\"AMERICANEEFD19942016-01-01\\\",\\\"AMERICANFFEE20002016-02-20\\\",\\\"AMERICANEEFD30002016-02-01\\\",\\\"AMERICANRREE45672016-01-20\\\"]}"}
+
+]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#5adbcebd-1bfb-49d2-b539-c26f09cdddd6">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="united_flights_json"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#14f8947d-89f4-465f-af68-ef5ae69c950e">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="Flight_pojo[]"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#7969f2ec-49a5-4c67-9ab9-2aa5caae8883">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="american_flights_json"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#6d9daeb5-037d-41ea-b007-39fd22b52772">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="Flight_pojo[]"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#7e471573-b500-4c65-a6e2-04482ee18a79">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="Flight_pojo[]"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#51587532-9d0c-4a3a-8db0-633670fa7bd6">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="Flight_pojo[]"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#61c57b6c-16c7-4574-a47d-5bacdd034602">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="flight_ID"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>
